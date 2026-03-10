@@ -1,0 +1,42 @@
+name: Validate Data
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - '*.txt'
+      - '*.dic'
+  pull_request:
+    branches: [master, main]
+    paths:
+      - '*.txt'
+      - '*.dic'
+
+jobs:
+  validate:
+    name: Validate word lists
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run validation
+        run: python scripts/validate.py
+
+      - name: Check file encoding
+        run: |
+          for file in *.txt *.dic; do
+            if [ -f "$file" ]; then
+              encoding=$(file -bi "$file" | grep -oP 'charset=\K[^ ]+')
+              if [[ "$encoding" != "utf-8" && "$encoding" != "us-ascii" ]]; then
+                echo "::error file=$file::File encoding is $encoding, expected utf-8"
+                exit 1
+              fi
+            fi
+          done
+          echo "All files are UTF-8 encoded."

@@ -1,0 +1,26 @@
+name: Stale Issues
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          stale-issue-message: >
+            本 Issue 已超过 60 天没有活动，将被标记为 stale。
+            如果仍有需要，请回复以保持开启状态。
+          stale-pr-message: >
+            本 PR 已超过 60 天没有活动，将被标记为 stale。
+            如果仍有需要，请回复以保持开启状态。
+          days-before-stale: 60
+          days-before-close: 14
+          stale-issue-label: stale
+          stale-pr-label: stale
